@@ -20,7 +20,7 @@ namespace LynLogger.Views.Contents
     /// <summary>
     /// FleetInfoPresenter.xaml 的交互逻辑
     /// </summary>
-    public partial class FleetInfoPresenter : UserControl
+    public partial class FleetInfoPresenter : UserControl, INotifyPropertyChanged
     {
         public FleetInfoPresenter()
         {
