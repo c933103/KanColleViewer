@@ -135,7 +135,7 @@ namespace Grabacr07.KanColleViewer.Models
         private void UpdateRule()
         {
             Rules[int.MaxValue] = new ProxyRule() {
-                Enabled = true,
+                Enabled = IsEnabled,
                 Type = ProxyRule.MatchType.Any,
                 Action = (Host != null && IsEnabled) ? ProxyRule.MatchAction.Proxy : ProxyRule.MatchAction.SystemProxy,
                 ActionString = Host?.Contains(':') == true ? string.Format("[{0}]:{1}", Host, Port) : string.Format("{0}:{1}", Host, Port),
