@@ -41,8 +41,8 @@
                         Grid.Row="0" Grid.Column="0"
                         Grid.RowSpan="{Binding HorizontalTab, FallbackValue=2, ConverterParameter=1:2, Converter={StaticResource BoolToIntSelector}, Mode=OneWay, Source={x:Static models:Settings.Current}}"
                         Grid.ColumnSpan="{Binding HorizontalTab, FallbackValue=1, ConverterParameter=2:1, Converter={StaticResource BoolToIntSelector}, Mode=OneWay, Source={x:Static models:Settings.Current}}">
-            <metro:TabView ItemsSource="{Binding TabItems}"
-							SelectedValue="{Binding SelectedItem}"
+            <metro:TabView ItemsSource="{Binding TabItems, Mode=OneWay}"
+							SelectedValue="{Binding SelectedItem, Mode=TwoWay}"
                             Background="{DynamicResource ActiveBackgroundBrushKey}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -75,8 +75,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="{x:Type vm:TabItemViewModel}">
-                    <ContentControl Content="{Binding}"
-									    Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <ContentControl Content="{Binding}" Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibilityConverter}}" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
             <ItemsControl.Resources>

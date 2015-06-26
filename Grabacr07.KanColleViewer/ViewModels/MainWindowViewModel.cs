@@ -39,9 +39,11 @@ namespace Grabacr07.KanColleViewer.ViewModels
                         _browser.ShowNavigator = true;
                         break;
 					case Mode.Started:
-                        if (SelectedItem == StartContentViewModel.Instance)
-                            SelectedItem = TabItems.FirstOrDefault(x => x != StartContentViewModel.Instance);
-                        DispatcherHelper.UIDispatcher.BeginInvoke(new Action(() => TabItems.Remove(StartContentViewModel.Instance)));
+                        DispatcherHelper.UIDispatcher.BeginInvoke(new Action(() => {
+                            if (SelectedItem == StartContentViewModel.Instance)
+                                SelectedItem = TabItems.FirstOrDefault(x => x != StartContentViewModel.Instance);
+                            TabItems.Remove(StartContentViewModel.Instance);
+                        }));
 						StatusService.Current.Set(Properties.Resources.StatusBar_Ready);
 						ThemeService.Current.ChangeAccent(Accent.Blue);
                         _browser.ShowNavigator = false;
@@ -130,9 +132,11 @@ namespace Grabacr07.KanColleViewer.ViewModels
             set
             {
                 if (this._SelectedItem != value) {
+                    if (this._SelectedItem != null) _SelectedItem.IsSelected = false;
                     this._SelectedItem = value;
-                    this.RaisePropertyChanged();
+                    if (value != null) value.IsSelected = true;
 
+                    this.RaisePropertyChanged();
                     StatusBar = value;
                 }
             }
