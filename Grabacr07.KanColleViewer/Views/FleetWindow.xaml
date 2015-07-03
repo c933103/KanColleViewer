@@ -1010,7 +1010,7 @@
 							<ContentControl.Style>
 								<Style TargetType="{x:Type ContentControl}">
 									<Style.Triggers>
-                                        <DataTrigger Binding="{x:Static models:Helper.IsInDesignMode}"
+                                        <DataTrigger Binding="{Binding Source={x:Static models:Helper.IsInDesignMode}, Mode=OneTime}"
 													 Value="True">
 											<Setter Property="Content"
 													Value="{Binding Ship}" />
