@@ -70,20 +70,9 @@ namespace Grabacr07.KanColleWrapper
 
 		internal void Update(kcsapi_kdock[] source)
 		{
-			if (this.Docks.Count == source.Length)
-			{
-				foreach (var raw in source)
-				{
-					var target = this.Docks[raw.api_id];
-					if (target != null) target.Update(raw);
-				}
-			}
-			else
-			{
-				this.Docks.ForEach(x => x.Value.Dispose());
-				this.Docks = new MemberTable<BuildingDock>(source.Select(x => new BuildingDock(x)));
-			}
-		}
+            if(this.Docks.SetValueRange(source, x => x.api_id, x => new BuildingDock(x), (obj, dat) => obj.Update(dat), true, x => x.Dispose()))
+                RaisePropertyChanged(nameof(Docks));
+        }
 
 		private void GetShip(kcsapi_kdock_getship source)
 		{

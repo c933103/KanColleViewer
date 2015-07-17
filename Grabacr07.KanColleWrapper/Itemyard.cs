@@ -14,17 +14,11 @@ namespace Grabacr07.KanColleWrapper
 	public class Itemyard : NotificationObject
 	{
 		/// <summary>
-		/// 出撃中にドロップで入手した装備の数。
-		/// 帰投して slot_item を取得するまでは新しい装備の ID が判らないので、数だけ控えておき、SlotItemsCount で使用する。
-		/// </summary>
-		private int droppedItemsCount;
-
-		/// <summary>
 		/// <see cref="SlotItems"/> と、出撃中に入手したものを含んだ装備数を取得します。
 		/// </summary>
 		public int SlotItemsCount
 		{
-			get { return this.SlotItems.Count + droppedItemsCount; }
+			get { return this.SlotItems.Count; }
 		}
 
 		#region SlotItems 変更通知プロパティ
@@ -96,14 +90,15 @@ namespace Grabacr07.KanColleWrapper
 
 		internal void Update(kcsapi_slotitem[] source)
 		{
-			this.droppedItemsCount = 0;
-			this.SlotItems = new MemberTable<SlotItem>(source.Select(x => new SlotItem(x)));
-		}
+            if(this.SlotItems.SetValueRange(source, x => x.api_id, x => new SlotItem(x), (obj, dat) => obj.Update(dat), true))
+                RaiseSlotItemsChanged();
+        }
 
 		internal void Update(kcsapi_useitem[] source)
 		{
-			this.UseItems = new MemberTable<UseItem>(source.Select(x => new UseItem(x)));
-		}
+			if(this.UseItems.SetValueRange(source, x => x.api_id, x => new UseItem(x), (obj, dat) => obj.Update(dat), true))
+                RaisePropertyChanged(nameof(UseItems));
+        }
 
 		internal void AddFromDock(kcsapi_kdock_getship source)
 		{
@@ -187,8 +182,8 @@ namespace Grabacr07.KanColleWrapper
 
 		private void RaiseSlotItemsChanged()
 		{
-			this.RaisePropertyChanged("SlotItems");
-			this.RaisePropertyChanged("SlotItemsCount");
+			this.RaisePropertyChanged(nameof(SlotItems));
+			this.RaisePropertyChanged(nameof(SlotItemsCount));
 		}
 	}
 }

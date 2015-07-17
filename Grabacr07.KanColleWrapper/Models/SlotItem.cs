@@ -13,7 +13,17 @@ namespace Grabacr07.KanColleWrapper.Models
 			get { return this.RawData.api_id; }
 		}
 
-		public SlotItemInfo Info { get; private set; }
+        private SlotItemInfo _info;
+		public SlotItemInfo Info
+        {
+            get { return _info; }
+            private set
+            {
+                if (_info == value) return;
+                _info = value;
+                RaisePropertyChanged();
+            }
+        }
 
 		public int Level
 		{
@@ -36,19 +46,36 @@ namespace Grabacr07.KanColleWrapper.Models
 			this.Info = KanColleClient.Current.Master.SlotItems[this.RawData.api_slotitem_id] ?? SlotItemInfo.Dummy;
 		}
 
+        internal void Update(kcsapi_slotitem data)
+        {
+            var oldLevel = Level;
+
+            UpdateRawData(data);
+            this.Info = KanColleClient.Current.Master.SlotItems[this.RawData.api_slotitem_id] ?? SlotItemInfo.Dummy;
+
+            if(Level != oldLevel) {
+                this.RaiseLevelPropertyChanged();
+            }
+        }
 
 		public void Remodel(int level, int masterId)
 		{
 			this.RawData.api_level = level;
 			this.Info = KanColleClient.Current.Master.SlotItems[masterId] ?? SlotItemInfo.Dummy;
 
-			this.RaisePropertyChanged("Info");
-			this.RaisePropertyChanged("Level");
-		}
+            RaiseLevelPropertyChanged();
+        }
 
 		public override string ToString()
 		{
 			return string.Format("ID = {0}, Name = \"{1}\", Level = {2}", this.Id, this.Info.Name, this.Level);
 		}
+
+        private void RaiseLevelPropertyChanged()
+        {
+            RaisePropertyChanged(nameof(Level));
+            RaisePropertyChanged(nameof(LevelText));
+            RaisePropertyChanged(nameof(NameWithLevel));
+        }
 	}
 }

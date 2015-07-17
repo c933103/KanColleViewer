@@ -186,7 +186,8 @@ namespace Grabacr07.KanColleWrapper
 
 		private void RaiseShipsChanged()
 		{
-			this.RaisePropertyChanged("Ships");
+            DroppedShips = 0;
+            this.RaisePropertyChanged(nameof(Ships));
 		}
 
 
@@ -196,30 +197,9 @@ namespace Grabacr07.KanColleWrapper
 		/// 指定した <see cref="kcsapi_ship2"/> 型の配列を使用して、<see cref="Ships"/> プロパティ値を更新します。
 		/// </summary>
 		internal void Update(kcsapi_ship2[] source)
-		{
-			if (source.Length <= 1)
-			{
-				foreach (var ship in source)
-				{
-					var target = this.Ships[ship.api_id];
-					if (target == null) continue;
-
-					target.Update(ship);
-
-					var fleet = this.GetFleet(target.Id);
-					if (fleet != null) fleet.State.Calculate();
-				}
-			}
-			else
-			{
-				this.Ships = new MemberTable<Ship>(source.Select(x => new Ship(this.homeport, x)));
-
-				if (KanColleClient.Current.IsInSortie)
-				{
-					foreach (var id in this.evacuatedShipsIds) this.Ships[id].Situation |= ShipSituation.Evacuation;
-					foreach (var id in this.towShipIds) this.Ships[id].Situation |= ShipSituation.Tow;
-				}
-			}
+        {
+            if(this.Ships.SetValueRange(source, x => x.api_id, x => new Ship(this.homeport, x), (obj, dat) => obj.Update(dat), source.Length > 1))
+                RaiseShipsChanged();
 		}
 
 
@@ -228,20 +208,9 @@ namespace Grabacr07.KanColleWrapper
 		/// </summary>
 		internal void Update(kcsapi_deck[] source)
 		{
-			if (this.Fleets.Count == source.Length)
-			{
-				foreach (var raw in source)
-				{
-					var target = this.Fleets[raw.api_id];
-					if (target != null) target.Update(raw);
-				}
-			}
-			else
-			{
-				this.Fleets.ForEach(x => x.Value.SafeDispose());
-				this.Fleets = new MemberTable<Fleet>(source.Select(x => new Fleet(this.homeport, x)));
-			}
-		}
+            if(this.Fleets.SetValueRange(source, x => x.api_id, x => new Fleet(this.homeport, x), (obj, dat) => obj.Update(dat), true, x => x.Dispose()))
+                RaisePropertyChanged(nameof(Fleets));
+        }
 
 
 		private void Change(SvData data)
@@ -292,7 +261,7 @@ namespace Grabacr07.KanColleWrapper
 
 		private void Combine(bool combine)
 		{
-			this.CombinedFleet.SafeDispose();
+			this.CombinedFleet?.Dispose();
 			this.CombinedFleet = combine
 				? new CombinedFleet(this.homeport, this.Fleets.OrderBy(x => x.Key).Select(x => x.Value).Take(2).ToArray())
 				: null;

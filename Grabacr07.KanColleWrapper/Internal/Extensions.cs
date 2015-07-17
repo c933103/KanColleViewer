@@ -14,12 +14,6 @@ namespace Grabacr07.KanColleWrapper.Internal
 			return session.GetResponseBodyAsString().Replace("svdata=", "");
 		}
 
-		public static void SafeDispose(this IDisposable resource)
-		{
-			if (resource != null) resource.Dispose();
-		}
-
-
 		/// <summary>
 		/// <see cref="Int32" /> 型の配列に安全にアクセスします。
 		/// </summary>

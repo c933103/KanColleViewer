@@ -30,6 +30,13 @@ namespace Grabacr07.KanColleWrapper.Models
 
 		internal UseItem(kcsapi_useitem rawData) : base(rawData) { }
 
+        internal void Update(kcsapi_useitem data)
+        {
+            UpdateRawData(data);
+            RaisePropertyChanged(nameof(Name));
+            RaisePropertyChanged(nameof(Count));
+        }
+
 		public override string ToString()
 		{
 			return string.Format("ID = {0}, Name = \"{1}\", Count = {2}", this.Id, this.Name, this.Count);
